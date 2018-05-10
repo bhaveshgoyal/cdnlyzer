@@ -1,3 +1,5 @@
+import subprocess
+
 img_extensions = [".jpeg", ".jpg", ".gif", ".png"]
 
 total_req = 0
@@ -21,81 +23,33 @@ img_size = 0
 css_size = 0
 js_size = 0
 
-def check_image(url):
-	return any(ext in url for ext in img_extensions)
-
-def check_js(url):
-	return ".js" in url
-
-def check_css(url):
-	return ".css" in url
-
-def check_static(url):
-	with open("names", "r") as fp:
-		names = fp.readlines()
-	names = [each.rstrip()[:-1].lstrip() for each in names]
-	for each in names:
-		mapping = eval(each)
-		if mapping[0] in url:
-			return True
-	return False
 
 def get_base(url):
-	print ("Checking " + url)
-	with open("names", "r") as fp:
+	with open("top200", "r") as fp:
 		names = fp.readlines()
-	names = [each.rstrip()[:-1].lstrip() for each in names]
+	names = [each.strip().split(',')[1] for each in names]
 	for each in names:
-		mapping = eval(each)
-		if mapping[0] in url:
-			return mapping[0]
+		if each in url:
+			return each
 	return ""
-
-def check_dynamic(url, base):
-	#RAHUL's API
-	return True
-
-def print_req_analysis():
-	global total_req
-	
-	global img_req
-	global img_static_req
-	global img_dyn_req
-
-	global js_req
-	global js_static_req
-	global js_dyn_req
-
-	global css_req
-	global css_static_req
-	global css_dyn_req
-
-	global base_req
-
-	print ("Percentage images", (float(img_req)/total_req)*100)
-	if img_req > 0:
-		print ("Percentage static CDN images", (float(img_static_req)/img_req)*100)
-		print ("Percentage dynamic CDN images", (float(img_dyn_req)/img_req)*100)
-	print ("Percentage css", (float(css_req)/total_req)*100)
-	if css_req > 0:
-		print ("Percentage static CDN css", (float(css_static_req)/css_req)*100)
-		print ("Percentage dynamic CDN css", (float(css_dyn_req)/css_req)*100)
-	print ("Percentage js", (float(js_req)/total_req)*100)
-	if js_req > 0:
-		print ("Percentage static CDN js", (float(js_static_req)/js_req)*100)
-		print ("Percentage dynamic CDN js", (float(js_dyn_req)/js_req)*100)
-	print (base_req)
 
 def print_res_analysis():
 	global img_size
 	global css_size
 	global js_size
 	global total_size
-	
+	global base_req
+
 	print ("Total bytes", total_size)
 	print ("Image bytes", img_size)
 	print ("CSS bytes", css_size)
 	print ("JS bytes", js_size)
+
+	with open("out/" + base_req + "_res", "w+") as fp:
+		fp.write("Total:" + str(total_size) + "\n")
+		fp.write("Image:" + str(img_size) + "\n")
+		fp.write("CSS:" + str(css_size) + "\n")
+		fp.write("JS:" + str(js_size) + "\n")
 
 def request(flow):
 	global total_req
@@ -111,32 +65,16 @@ def request(flow):
 	global css_req
 	global css_static_req
 	global css_dyn_req
+	global base_req
 
-	
 	total_req += 1
-
-	if check_image(flow.request.path):
-		img_req += 1
-		if check_static(flow.request.pretty_host):
-			img_static_req += 1
-		elif check_dynamic(flow.request.pretty_host, base_req):
-			img_dyn_req += 1
-
-	if check_js(flow.request.path):
-		js_req += 1
-		if check_static(flow.request.pretty_host):
-			js_static_req += 1
-		elif check_dynamic(flow.request.pretty_host, base_req):
-			js_dyn_req += 1
-
-	if check_css(flow.request.path):
-		css_req += 1
-		if check_static(flow.request.pretty_host):
-			css_static_req += 1
-		elif check_dynamic(flow.request.pretty_host, base_req):
-			css_dyn_req += 1
+	if base_req == "":
+		base_req = get_base(flow.request.pretty_host)
 	
-	print_req_analysis()
+	if base_req != "":
+		with open("out/" + base_req + "_req", "a+") as fp:
+			fp.write(flow.request.url + "," + base_req + "\n")
+	
 
 def response(flow):
 	global img_size
