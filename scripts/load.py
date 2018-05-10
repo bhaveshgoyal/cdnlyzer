@@ -1,7 +1,7 @@
 from selenium import webdriver
 from selenium.webdriver.common.proxy import Proxy, ProxyType
 
-source = "https://amazon.com"
+source = "https://cisco.com"
 
 prox = Proxy()
 prox.proxy_type = ProxyType.MANUAL
