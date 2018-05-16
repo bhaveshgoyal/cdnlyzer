@@ -1,0 +1,19 @@
+The first part of our study examines how CDNs are used today to server the web content in Alexa Top 200 Websites. We analyzed the home pages and all the embedded content of Alexa Top 200 Websites. We found out that 68.5% of the Alexa Top 200 websites have their base page served by the CDN. We used a DNS + Ping Response time approach to arrive at these results. We make a DNS query to the base page and check if its a CNAME record pointing to a CDN. For DNS lookup we used the dig (Domain Information Groper) utility that looks for a CDN provider as the authoritative server. We have a list of top CDN providers to verify the match. We also check the average ping response time by pinging the origin server and the base page. If it is a CDN in most of the cases origin server will have a higher ping response time than the CDN server. We found out that on an average ping response time for CDN server is 31.13 ms less than origin server. In terms of bytes content 47.6 % of the images bytes, 4.88% of the CSS bytes,  29% of the JS bytes and 82% of the overall bytes on Alexa Top 200 websites is served by the CDN. Images comprises of 58% of the total content that is served by the CDN. 
+CSS comprises of 5.94 of the total CDN content and JS comprises of 36.06 percentage of the total CDN traffic.
+
+
+Bar charts and venn diagrams
+
+151404699/109658950
+image - 151404699/261063649 
+CSS - 15530378/261063649
+JS - 94128572/261063649 - 5.94, 36.06
+
+
+Performance study of Content Distribution Networks
+The performance of CDNs can be measured in many ways
+1. How many requests are offloaded from the origin servers
+2. Impact on client latency
+3. Ability to load balance CDN requests
+
+On an average in terms of number of hops distance to CDN server is 65.14 hops wherease distance to origin server is 78.21 hops, in terms of number of miles distance to CDN servers if 2368.59 wherease distance to CDN servers is 1838.06. Average TTL for a CDN server as per DNS record is 50.03. Average ping response time to origin server is 82.65 ms where the same for CDN server is 48.38 ms. Average ping difference time between origin and CDN server is 34.26 ms.

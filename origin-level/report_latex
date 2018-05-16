@@ -1,0 +1,318 @@
+%
+% File acl2015.tex
+%
+% Contact: car@ir.hit.edu.cn, gdzhou@suda.edu.cn
+%%
+%% Based on the style files for ACL-2014, which were, in turn,
+%% Based on the style files for ACL-2013, which were, in turn,
+%% Based on the style files for ACL-2012, which were, in turn,
+%% based on the style files for ACL-2011, which were, in turn, 
+%% based on the style files for ACL-2010, which were, in turn, 
+%% based on the style files for ACL-IJCNLP-2009, which were, in turn,
+%% based on the style files for EACL-2009 and IJCNLP-2008...
+
+%% Based on the style files for EACL 2006 by 
+%%e.agirre@ehu.es or Sergi.Balari@uab.es
+%% and that of ACL 08 by Joakim Nivre and Noah Smith
+
+\documentclass[11pt]{article}
+\usepackage{acl2015}
+\usepackage{times}
+\usepackage{url}
+\usepackage{latexsym}
+\usepackage{graphicx}
+\usepackage{caption}
+% \usepackage{authblk}
+
+%\setlength\titlebox{5cm}
+
+% You can expand the titlebox if you need extra space
+% to show all the authors. Please do not make the titlebox
+% smaller than 5cm (the original size); we will check this
+% in the camera-ready version and ask you to change it back.
+
+
+\title{CDNlyzer - CDN analysis for Alexa top 200 websites  \\ {\normalfont \large CSE 534 : Fundamentals of Computer Networks}
+}
+
+
+\author{Bhavesh Goyal \\
+    111482386 \\
+  Stony Brook University \\
+  {\tt bgoyal@cs.stonybrook.edu} \\ \\ 
+  \textbf{Sweta Kumari} \\
+  111497926 \\
+  Stony Brook University \\
+  {\tt swkumari@cs.stonybrook.edu} \\\And 
+  Rahul Sihag \\
+  111462160 \\
+  Stony Brook University \\
+  {\tt rsihag@cs.stonybrook.edu} \\ \\
+  \textbf{Aruna Balasubramanium} \\
+  Stony Brook University \\
+  {\tt arunab@cs.stonybrook.edu} \\ }     
+
+\date{}
+
+
+% To-do
+% 1. Add comparison plot (batch vs stream) 
+% Do for chunk size large - write separate batch script
+% Add timer funcs in stream code
+% Plot time scale diff
+
+\begin{document}
+
+\maketitle{}
+
+\begin{abstract}
+
+\textbf{
+Content Delivery Networks or Content Distribution Networks (CDNs) are a mechanism to distribute service spatially relative to end-users to provide high availability and high performance. CDNs serve a large portion of the Internet content today, including web objects (text, graphics and scripts), downloadable objects (media files, software, documents), applications (e-commerce, portals), live streaming media, on-demand streaming media, and social networks. CDNs are a layer in the internet ecosystem. Content owners such as media companies and e-commerce vendors pay CDN operators to deliver their content to their end users.
+\\Today CDNs are an inevitable solution for most websites looking for performance improvements. Thus it is important for us to understand how the websites make use of this “next-level” optimization system. In this paper we discuss and analyze the CDN properties and traffic for Alexa Top 200 websites. The code is available on Github
+\url{https://github.com/bhaveshgoyal/cdnlyzer}. 
+}
+\end{abstract}
+
+\section{Introduction}
+A content delivery network (CDN) refers to a geographically distributed group of servers which work together to provide fast delivery of Internet content. A CDN allows for the quick transfer of assets needed for loading Internet content including HTML pages, javascript files, stylesheets, images, and videos. The popularity of CDN services continues to grow, and today the majority of web traffic is served through CDNs, including traffic from major sites like Youtube, Facebook, Netflix, and Amazon.
+
+While there are many CDN providers and majority of the internet traffic today is served by CDN, little work has been done on the extent to which CDNs are being used and their performance benefits. Our work is a comprehensive study analyzing today's CDNs and seeks to address this gap by gathering a lot of data related to CDN usage by Alexa top 200 websites and answering the following questions:
+\begin{enumerate}
+  \item What CDN techniques are employed and how the use of CDN techniques influence performance?
+  \item What is the extent of CDN usgae by the origin server sites
+  \item What is the nature of content served by the CDNs for the origin servers
+  \item Analyzing frequency at which a CDN serves an origin site
+\end{enumerate}
+
+This paper describes the answers to above problems that we have found through our analysis on Alexa top 200 websites. The rest of the paper is organized as follows: Section 2 provides the background on studied CDN techniques. Section 3 examines the usage of CDN in today's internet. Section 4 describes our methodology. Section 5 describes the results. Section 6 summarizes the results and conludes.
+
+\cite{Agarwal:2013:BQB:2465351.2465355}, G-OLA \cite{Zeng:2015:GGO:2723372.2735381}, SnappyData \cite{Ramnarayan:2016:SHT:2882903.2899408} to make the accuracy-time tradeoff on the fly and run interactive queries on batch data.
+
+Going back to the example of a social network, that wishes to detect trending conversation topics every minute. Now, it wants to know the trending conversation topic until this time. To answer this, the current solutions asks us to go to the data stored in some storage systems and run batch queries. We approach this by generating and storing much smaller sized states while the data is being streamed and then answer such queries at any point without running batch jobs.
+
+In the next sections of the paper, we are going to discuss the core idea, system architecture and the results of our system.
+
+
+
+\section{CDN techniques}
+
+When the browser makes a DNS request for a domain name that is handled by a CDN, there is a slightly different process than with small, one-IP sites. The server handling DNS requests for the domain name looks at the incoming request to determine the best set of servers to handle it. At it’s simplest, the DNS server does a geographic lookup based on the DNS resolver’s IP address and then returns an IP address for an edge server that is physically closest to that area. So if I am making a request and the DNS resolver I am routed to is Virginia, I will be given an IP address for a server on the East coast; if I make the same request through a DNS resolver in California, I will be given an IP address for a server on the West coast. You may not end up with a DNS resolver in the same geographic location from where you are making the request.
+
+That{'}s the first step of the process: getting the request to the closest server possible. Keep in mind that companies may optimize their CDNs in other ways as well, for instance, redirecting to a server that is cheaper to run or one that is sitting idle while another is almost at capacity. In any case, the CDN smartly returns the best possible IP address to handle the request.
+
+
+
+ 
+
+\subsection{CDN redirection techniques}
+Basically there are two methods for redirecting client requests to a particular CDN server in a distributed network of content providers.
+
+\begin{enumerate}
+  \item DNS redirection - In DNS redirection the authoritative DNS name server is controlled by the CDN. When the authoritative DNS server receives a DNS request from client it redirects the request by resolving the CDN server name to the IP address of one content server. The resolution is done on the basis of a number of factors such as the availability of resources, network conditions and proximity of server to the client. The reply has a TTL field that is used for load balancing among different servers. There are two different DNS redirection techniques: full site redirection (example is amazon.com being redirected to its CDN cloudfront) and partial site redirection (example is flipkart.com landing page). The origin server is hidden except to the CDN in case of full site redirection. All the requests for the origin server are redirected to the CDN and CDN serves the content.
+  In case of partial site redirection the origin site base url is served by the original server and the embedded URLs for objects are modified to be served by the CDN. 
+  \item URL rewriting - In URL rewriting the origin server rewrites URL links as part of dynamically generating pages to redirect clients to different content servers. 
+\end{enumerate}
+
+
+\section{Use of CDN in today's internet}
+
+The first part of our study examines how CDNs are used today to server the web content in Alexa Top 200 Websites. We analyzed the home pages and all the embedded content of Alexa Top 200 Websites. We found out that 68.5\% of the Alexa Top 200 websites have their base page served by the CDN. We used a DNS + Ping Response time approach to arrive at these results. We make a DNS query to the base page and check if its a CNAME record pointing to a CDN. For DNS lookup we used the dig (Domain Information Groper) utility that looks for a CDN provider as the authoritative server. We have a list of top CDN providers to verify the match. We also check the average ping response time by pinging the origin server and the base page. If it is a CDN in most of the cases origin server will have a higher ping response time than the CDN server. We found out that on an average ping response time for CDN server is 31.13 ms less than origin server. In terms of bytes content 47.6\% of the images bytes, 4.88\% of the CSS bytes,  29\% of the JS bytes and 82\% of the overall bytes on Alexa Top 200 websites is served by the CDN. Images comprises of 58\% of the total content that is served by the CDN.
+CSS comprises of 5.94\% of the total CDN content and JS comprises of 36.06\% percentage of the total CDN traffic.\\
+\\
+    \includegraphics[width=0.5\textwidth]{piechart.png}
+    \captionof{figure}{\% distribution of CDN content}
+    
+\begin{enumerate}
+    \item \textbf{Query Parser:} The query parser takes the input nested query and parses it to return the set of inner queries from the input query.\\
+    \textit{Input}: {\tt{Select AVG(col2) from table where col2 > (Select AVG(col2) from table)}}\\
+    \textit{Output}: {\tt{(Select AVG(col2) from table)}}
+    
+    \item \textbf{Partition and State Merger:} This module takes the input RDDs $(P_i)$ and the state generated$(S_{i-1})$ from the previous RDD and returns a union of it$(D_i = P_i + S_{i-1})$.
+    
+    \item \textbf{Query Compiler:} It takes $(D_i)$ and the set of inner queries generated by \textit{Query Parser} and generates the new State$(S_i)$ and intermediate query output for the inner queries which is then replaced in the original query to generate a simpler intermediate query. \\
+    \textit{Input}: {\tt{Select AVG(col2) from table where col2 > (Select AVG(col2) from table)}} and $(D_i)$ \\
+    \textit{Output}: {\tt{(Select AVG(col2) from table where col2> \textbf{val})}} and $(S_i)$.
+    
+    \item \textbf{Output Generator:} Output Generator takes the intermediate query generated by Query compiler and processes it using SparkSQL to give an approximate answer.
+    
+\end{enumerate}
+
+
+
+\section{Performance study}
+
+
+The performance of CDNs can be measured in many ways. Following are some of the ways we calculated the performance of CDNs.
+
+\begin{enumerate}
+\item How many requests are offloaded from the origin servers
+\item Impact on client latency
+\item Ability to load balance CDN requests
+
+\end{enumerate}
+
+On an average in terms of number of hops distance to CDN server is 65.14 hops wherease distance to origin server is 78.21 hops, in terms of number of miles distance to CDN servers if 2368.59 wherease distance to CDN servers is 1838.06. Average ping response time to origin server is 82.65 ms where the same for CDN server is 48.38 ms. Average ping difference time between origin and CDN server is 34.26 ms.
+
+\includegraphics[width=0.5\textwidth]{hops.png}
+\captionof{figure}{Hop Distance between CDN and origin server and Ping latency}
+\hspace{0pt}
+\\
+For load balancing CDNs assign small DNS TTLs for the IP addresses and as a result client have to do frequent DNS lookups. And it CDNs determine which server they want the client to use. We observer an average TTL for a CDN server as per DNS record to be 50.03 seconds. The graph of TTL values for Alexa Top 20 sites is shown below. Most of the TTl values are 60 seconds
+
+
+
+\includegraphics[width=0.5\textwidth]{ttl.png}
+\captionof{figure}{DNS TTL values for Alexa Top 20 sites}
+
+
+
+
+\section{Methodology}
+
+\subsection{Build Environment}
+We used two Amazon EC2 servers geographically distributed (East and West zones).
+The list of technologies/libraries used are as follows:
+
+\begin{enumerate}
+  \item Selenium - Realtime webpage rendering
+  \item Mitmproxy - Forward proxy
+  \item BeautifulSoup - Webscrapping
+  \item Geopy - IP location determination
+  \item Pyping - Fabricating ICMP messages
+  \item Python - Experimental Testing and coding
+\end{enumerate}
+
+We have used Spark Streaming file stream source using {\tt textFileStream(dataDirectory)} which monitors dataDirectory folder for any new input files. We wrote a bash script which copies file from input source to dataDirectory and this new file gets detected by Spark streaming as the new streaming input. 
+
+\subsection{abc}
+Origin Level Analysis: For each request CDN locates a server which is closest to the client to reduce the latency associated. The notion of closeness could be a distance metric, number of hops metric or ping response time metric. Thus in our study we determined the CDN server presence using the following three parameters:
+
+\begin{enumerate}
+\item Geographically - We used a distance based approach using Geoips to find the distance of origin server and CDN server by determining the location coordinates from IP addresses.
+\item Topologically - We analyzed the traceroute paths (upto a maximum of 128 hops) to origin server and CDN server and compared hop counts of both.
+\item Latency - We pinged the origin and CDN servers and calculated the average response times for 10 ICMP echo reply packets.
+\end{enumerate}
+We also determined the CDN server update frequency using the average TTL in DNS response.
+
+Query: {\tt{Select AVG(col2) from table where col2 > (Select AVG(col2) from table)}}
+
+\includegraphics[width=0.5\textwidth]{mitm.png}
+    \captionof{figure}{Site Level Analysis Setup}
+    
+
+
+\begin{center}
+\begin{tabular}{ |c|c|c|c| } 
+ \hline
+ Type & Time & a & b\\ 
+ \hline
+ Stream & 95 \\ 
+ Batch & 339 \\ 
+ \hline
+\end{tabular}
+\captionof{table}{Time taken (in seconds) for 10 iterations on Extra large data set}
+\end{center}
+
+As the size of data set increases, the variation in query output decreases. This is an expected behaviour as when we have more data, the variation in data is less. 
+
+We have compared the query output with the exact output from batch data and for different bootstrap values for streaming data. Bootstrap value is an indication of the number of uncertain rows taken into consideration as part of the \textit{state}. Increasing the bootstrap value makes the state contain more rows from previous iterations. A bootstrap value of 0 indicates current state + partition only contains rows from current partition and none from previous iterations. In figures 2-4 we compare for different values of bootstrap. In small and medium data set it is clearly evident that bootstrap value of standard deviation($\sim$ 9) is a quite good approximation. 
+
+Even the state grows quadratically with time, hence as an optimization, we only maintain state from previous 3 iterations. Thus having a temporal based state. 
+
+Finally, we also compare the time taken for 10 iterations between Streaming data and Batch data on Extra large data set. From table 1 it is clear that our query processing framework works significantly faster on streaming data compared to processing on batch data. 
+
+\section{Related Work}
+Online aggregation (OLA) is often the solution for interactive analysis. In OLA, the user can observe the progress of query by showing iteratively refined approximate answers. And the user has the ability to stop query execution when the desired accuracy is attained.
+
+Recent sampling based approximation query processing systems also target to answer batch queries interactively, but they come with an overhead of sample maintenance and periodic sample update.
+
+G-OLA is a mini-batch execution model which utilizes the idea of online aggregation to perform an interactive query on batch data, but it doesn't work on streaming data.
+
+Snappy data is a  unified  platform  for  real-time operational analytics, to support OLTP, OLAP, and stream analytics in a single integrated solution. 
+
+None of the above methods, give a solution for performing interactive query processing on streaming data. 
+
+\section{Discussion}
+Although we intend to make our system robust for any kind of aggregate operators, our system currently just supports COUNT, SUM, and AVG. 
+
+Also, one of the factors in state maintenance is a bootstrap value which determines the uncertain and deterministic sets. We have currently hard-coded the value in our code base, but later we want to implement the statistical bootstrapping module and integrate it into the system for better performance.
+
+As further work in this area, we see a potential in improvising the current state-based maintenance by taking just the uncertain columns in the state. We think, this may improve the performance time and will certainly lower the storage complexity.
+
+\section{Results}
+TODO SNAPSHOTS of EXCEL TABLES
+\subsection{CDN Usage}
+We identified the top 5 CDNs used amongst the Alexa 200 websites. These were ranked as follows:
+\begin{itemize}
+    \item Google
+    \item Amazon CloudFront
+    \item Akamai
+    \item CloudFlare
+    \item Fastly
+\end{itemize}
+
+Amongst the Top 200, we identified that almost [PERCENTAGE HERE] of origin websites used CDN at their base server to redirect queries to appropriate servers.
+
+The KS-statistics report that for the ping distributions tested, 77\% of origins(almost 154 of 200) rejected our NULL hypothesis meaning that they indeed use CDNs at the origin servers.
+
+\subsection{Geo Analysis}
+
+When repeated the experiment from two different geographical locations(Stony Brook, N. California) we observed some interesting results for origin level analysis.
+\begin{itemize}
+\item For East Coast, average TTL (update frequency of CDNs) was estimated to be ~4700ms, while for the West Coast, the metrics was as small as 50ms. The drastic shift could be attributed to the presence of some origins with non CDN usage who are based towards the West Coast and observed higher response time and higher TTL when analyzed.
+
+\item Both, our East and West Coast servers estimated almost same percentage of CDN Usage at base using out Dynamic DNS + ping based approach. For East Coast server, approx 68.75\% of origins observed CDN usage at base while the West Coast experiment observed [TODO]\% of origins at base.
+
+\item Repeating the experiment using KS-Hypothesis testing by analysing ping distribution, we observe that approx. 78.19\% of origins tend to use CDN at base. The results is higher than our Hybrid approach due to possible cached responses and lower ping times from edge dns servers.
+
+\end{itemize}
+
+\subsection{Site Level Analysis}
+
+Observing the percentage of static content on CDN, we found that majority of content served on CDN was found to be images followed by JS, followed by CSS. This is in accordance with our understanding that the content that is expected to change the least over time is outsourced to CDNs the most. Another observation was that, since we see that the average amount of JS served on CDNs is low as compared to static images, it could be inferred that the majority of web-servers prefer other dynamic JS scripts(Angular, phantom scripts) to be hosted on their local servers. This is again in accordance with the fact that primary use of CDNs is meant to be as proxy caches and not as a means computational servers.
+\\ \\
+On analysis of the method of content hosting preferred by webservers for their content, we observe the following statistics as seen from \textit{Table-2}.
+\\ \\
+From the statistics we also observe, that most website prefer use of Static URL + DNS based approach to serve content on websites. Such websites have dedicated urls set for serving static content which indirectly point to the CDN. This approach facilitates the convenience of not requiring to change the entire HTML of webpage every-time the CDN url change, but just the DNS entries. Thus it acts as a proxied URL that points towards CDN. Some websites example: Yahoo also had a 1:1 ratio of static vs DNS based usage.
+\\ \\
+We could also observe that most E-commerce websites such as amazon.com, netflix.com, alipayexpress.com preferred the majority of content on CDNs which could be attributed to the high availability requirement of the servers across entire country.  
+\begin{table}[]
+\centering
+\begin{tabular}{|l|l|l|l|}
+\hline
+\multirow{}{}{Hosting Method} & \multicolumn{3}{l|}{Type of Content} \\ \cline{2-4} 
+                                & Images     & CSS        & JS         \\ \hline
+Percentage content              & 35.53\%    & 3.14\%     & 14.96\%    \\ \hline
+URL Rewriting                   & 15.59\%    & 3.41\%     & 7.67\%     \\ \hline
+DNS based                       & 66.95\%    & 77.62\%    & 72.95\%    \\ \hline
+\end{tabular}
+\caption{Site Level Analysis}
+\label{my-label}
+\end{table}
+\section{Conclusion}
+
+CDNs are globally distributed and it helps in reducing the distance between the users and the origin servers. A CDN lets a user to connect to a geographically closer data center than the website's origin server. As the travel time for the request decrease, it helps in reducing the latency and providing faster service. A faster website means more visitors and sticiking around for long time. It reduces the bandwidth consumption and thus reduces the hosting costs.
+
+CDNs also help provide loading balancing through the use of TTL. With its distributed nature CDNs can handle more traffic and can withstand failure much better than the origin servers.
+CDNs also helps reducing attacks such as DoS, DDoS and improve website security. The globally distributed nature of a CDN means reduce distance between users and website resources. Instead of having to connect to wherever a website’s origin server may live, a CDN lets users connect to a geographically closer data center. Less travel time means faster service.
+
+
+Extras - 
+
+Byte Level Analysis
+Total Percentage of CDN Image Bytes -47% of the
+
+https://www.cs.utexas.edu/~yzhang/papers/cdn-imw01.ps
+https://en.wikipedia.org/wiki/Content_delivery_network
+https://www.cloudflare.com/learning/cdn/what-is-a-cdn/
+https://www.alexa.com/topsites
+
+
+TODO
+top cdn providers table or bargraph
+
+\bibliographystyle{unsrt}
+\bibliography{sample}
+
+\end{document}

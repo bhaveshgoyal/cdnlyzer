@@ -1,0 +1,29 @@
+#!/bin/sh
+
+##install
+# update-rc.d pinger defaults 99
+#
+##remove
+# update-rc.d pinger remove
+#
+
+case "$1" in
+  start)
+        screen -dmS pinger bash -c "cd ~/pyping; ./pinger.py example.com 2>>/var/log/example.com.ping.log"
+  ;;
+
+  restart|reload|force-reload)
+  ;;
+
+  stop)
+  ;;
+
+  status)
+  ;;
+  *)
+    exit 1
+    ;;
+esac
+
+exit 0
+
